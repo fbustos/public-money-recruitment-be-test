@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Mvc;
-using VacationRental.Api.Models;
+﻿using Microsoft.AspNetCore.Mvc;
+using VacationRental.Api.Handlers.RentalHandler;
+using VacationRental.Api.Models.Requests;
+using VacationRental.Api.Models.Responses;
 
 namespace VacationRental.Api.Controllers
 {
@@ -9,35 +9,35 @@ namespace VacationRental.Api.Controllers
     [ApiController]
     public class RentalsController : ControllerBase
     {
-        private readonly IDictionary<int, RentalViewModel> _rentals;
+        private readonly GetRental _getRental;
+        private readonly CreateRental _createRental;
+        private readonly UpdateRental _updateRental;
 
-        public RentalsController(IDictionary<int, RentalViewModel> rentals)
+        public RentalsController(GetRental getRental, CreateRental createRental, UpdateRental updateRental)
         {
-            _rentals = rentals;
+            _getRental = getRental;
+            _createRental = createRental;
+            _updateRental = updateRental;
         }
 
         [HttpGet]
         [Route("{rentalId:int}")]
         public RentalViewModel Get(int rentalId)
         {
-            if (!_rentals.ContainsKey(rentalId))
-                throw new ApplicationException("Rental not found");
-
-            return _rentals[rentalId];
+            return _getRental.Invoke(rentalId);
         }
 
         [HttpPost]
         public ResourceIdViewModel Post(RentalBindingModel model)
         {
-            var key = new ResourceIdViewModel { Id = _rentals.Keys.Count + 1 };
+            return _createRental.Invoke(model);
+        }
 
-            _rentals.Add(key.Id, new RentalViewModel
-            {
-                Id = key.Id,
-                Units = model.Units
-            });
-
-            return key;
+        [HttpPut]
+        [Route("{rentalId:int}")]
+        public ResourceIdViewModel Post(int rentalId, RentalBindingModel model)
+        {
+            return _updateRental.Invoke(rentalId, model);
         }
     }
 }
