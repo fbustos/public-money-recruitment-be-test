@@ -1,0 +1,6 @@
+### Considerations
+
+1- I consider that booking's unit cannot be transferable.
+2- Pending repositories unit tests
+3- Pending extract common methods for booking dates queries.
+4- Architecture chosen was based in DDD.
